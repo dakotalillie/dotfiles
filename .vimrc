@@ -46,6 +46,9 @@ Plug 'preservim/nerdtree'
 " Intellisense
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 
+" Auto close tags
+Plug 'alvan/vim-closetag'
+
 call plug#end()
 
 "Credit joshdick
@@ -122,7 +125,7 @@ set autoindent
 set expandtab
 
 " Number of auto-indent spaces
-set shiftwidth=2
+set shiftwidth=4
 
 " Enable smart-indent
 set smartindent
