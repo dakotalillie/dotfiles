@@ -52,6 +52,9 @@ Plug 'neoclide/coc.nvim', { 'branch': 'release' }
 " Auto close tags
 Plug 'alvan/vim-closetag'
 
+" Smooth scrolling
+Plug 'yuttie/comfortable-motion.vim'
+
 call plug#end()
 
 "Credit joshdick
