@@ -43,8 +43,14 @@ Plug 'prettier/vim-prettier', { 'do': 'npm install' }
 " Nerd tree
 Plug 'preservim/nerdtree'
 
+" Nerd tree git
+Plug 'Xuyuanp/nerdtree-git-plugin'
+
+" Tags generation
+Plug 'ludovicchabant/vim-gutentags'
+
 " Intellisense
-Plug 'neoclide/coc.nvim', {'branch': 'release'}
+Plug 'neoclide/coc.nvim', { 'branch': 'release' }
 
 " Auto close tags
 Plug 'alvan/vim-closetag'
@@ -81,6 +87,9 @@ let g:ctrlp_working_path_mode = 'ra'
 hi DiffAdd ctermbg=235 ctermfg=108 cterm=reverse guibg=#262626 guifg=#87af87 gui=reverse
 hi DiffChange ctermbg=235 ctermfg=103 cterm=reverse guibg=#262626 guifg=#8787af gui=reverse
 hi DiffDelete ctermbg=235 ctermfg=131 cterm=reverse guibg=#262626 guifg=#af5f5f gui=reverse
+
+" Startup commands
+autocmd vimenter * NERDTree
 
 " Syntax highlighting
 syntax on
