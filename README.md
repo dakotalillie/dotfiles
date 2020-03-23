@@ -91,3 +91,9 @@ You may need to add this to your `.zshrc`:
 export TERM=xterm-256color
 ```
 
+You'll also want to install the silver surfer to speed up ctrl-p:
+
+```bash
+brew install the_silver_searcher
+```
+
