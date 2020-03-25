@@ -25,9 +25,6 @@ Plug 'vim-airline/vim-airline'
 " Code commenting
 Plug 'tpope/vim-commentary'
 
-" Git gutter
-Plug 'airblade/vim-gitgutter'
-
 " Tmux integration
 Plug 'christoomey/vim-tmux-navigator'
 
@@ -95,9 +92,12 @@ hi DiffChange ctermbg=235 ctermfg=103 cterm=reverse guibg=#262626 guifg=#8787af 
 hi DiffDelete ctermbg=235 ctermfg=131 cterm=reverse guibg=#262626 guifg=#af5f5f gui=reverse
 
 " NerdTree
-autocmd vimenter * NERDTree
 autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
 map <C-n> :NERDTreeToggle<CR>
+
+" Prettier
+let g:prettier#autoformat = 1
+let g:prettier#autoformat_require_pragma = 0
 
 " Syntax highlighting
 syntax on
@@ -158,6 +158,9 @@ set undolevels=1000
 
 " Backspace behaviour
 set backspace=indent,eol,start
+
+" Reload files when they change on disk
+set autoread
 
 " All of the following are required by COC
 " TextEdit might fail if hidden is not set.
