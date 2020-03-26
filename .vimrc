@@ -162,6 +162,11 @@ set backspace=indent,eol,start
 " Reload files when they change on disk
 set autoread
 
+" Enable copying from vim
+set clipboard+=unnamedplus
+
+
+
 " All of the following are required by COC
 " TextEdit might fail if hidden is not set.
 set hidden
