@@ -97,3 +97,15 @@ You'll also want to install the silver surfer to speed up ctrl-p:
 brew install the_silver_searcher
 ```
 
+Install GNU-Grep to take advantage of Perl-compatible regular expressions:
+
+```bash
+brew install grep
+```
+
+And add this to your `.zshrc`:
+
+```bash
+export PATH="/usr/local/opt/grep/libexec/gnubin:$PATH"
+```
+
