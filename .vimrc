@@ -20,7 +20,7 @@ Plug 'ctrlpvim/ctrlp.vim'
 Plug 'sheerun/vim-polyglot'
 
 " Status line
-Plug 'vim-airline/vim-airline'
+Plug 'itchyny/lightline.vim'
 
 " Code commenting
 Plug 'tpope/vim-commentary'
@@ -73,7 +73,10 @@ endif
 
 colorscheme onedark
 let g:onedark_terminal_italics = 0
-let g:airline_theme='onedark'
+
+let g:lightline = {
+      \ 'colorscheme': 'onedark',
+      \ }
 
 " Ctrl-P config
 let g:ctrlp_map = '<c-p>'
