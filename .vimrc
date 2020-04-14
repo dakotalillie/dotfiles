@@ -13,6 +13,9 @@ Plug 'tpope/vim-sensible'
 " Git stuff
 Plug 'tpope/vim-fugitive'
 
+" Surroundings
+Plug 'tpope/vim-surround'
+
 " Fuzzy finder
 Plug 'ctrlpvim/ctrlp.vim'
 
