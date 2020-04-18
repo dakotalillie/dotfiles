@@ -110,3 +110,9 @@ And add this to your `.zshrc`:
 ```bash
 export PATH="/usr/local/opt/grep/libexec/gnubin:$PATH"
 ```
+
+Enable vi-mode by adding the plugin to your oh-my-zsh plugins in `.zshrc`:
+
+```
+plugins=(git vi-mode)
+```
