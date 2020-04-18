@@ -13,6 +13,9 @@ Plug 'tpope/vim-sensible'
 " Git stuff
 Plug 'tpope/vim-fugitive'
 
+" Git gutter
+Plug 'airblade/vim-gitgutter'
+
 " Surroundings
 Plug 'tpope/vim-surround'
 
