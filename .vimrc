@@ -94,10 +94,11 @@ let g:ctrlp_map = '<c-p>'
 let g:ctrlp_cmd = 'CtrlP'
 let g:ctrlp_working_path_mode = 'ra'
 let g:ctrlp_max_files=0
-let g:ctrlp_custom_ignore = 'node_modules\|DS_Store\|git'
 let g:ctrlp_cache_dir = $HOME . '/.cache/ctrlp'
 if executable('ag')
-  let g:ctrlp_user_command = 'ag %s -l --nocolor -g ""'
+  " Use ag in CtrlP for listing files. Lightning fast, respects .gitignore
+  " and .agignore. Also ignores .git
+  let g:ctrlp_user_command = 'ag %s -l --hidden --ignore .git --nocolor -g ""'
 endif
 
 " Diff coloring
