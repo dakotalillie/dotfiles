@@ -134,7 +134,7 @@ hi DiffDelete ctermbg=235 ctermfg=131 cterm=reverse guibg=#262626 guifg=#af5f5f 
 autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
 map <C-n> :NERDTreeToggle<CR>
 let NERDTreeShowHidden=1
-let NERDTreeIgnore=['\.git$']
+let NERDTreeIgnore=['\.git$', '.DS_Store']
 let NERDTreeShowLineNumbers=1
 let g:NERDTreeWinSize=50
 
