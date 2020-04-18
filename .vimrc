@@ -40,9 +40,6 @@ Plug 'joshdick/onedark.vim'
 " Auto pairs
 Plug 'jiangmiao/auto-pairs'
 
-" Prettier
-Plug 'prettier/vim-prettier', { 'do': 'npm install' }
-
 " Nerd tree
 Plug 'preservim/nerdtree'
 
@@ -81,8 +78,16 @@ colorscheme onedark
 let g:onedark_terminal_italics = 0
 
 let g:lightline = {
-      \ 'colorscheme': 'onedark',
-      \ }
+  \ 'colorscheme': 'onedark',
+  \ }
+
+" coc extensions
+let g:coc_global_extensions = [
+  \ 'coc-tsserver',
+  \ 'coc-eslint',
+  \ 'coc-prettier',
+  \ 'coc-json',
+  \ ]
 
 " Ctrl-P config
 let g:ctrlp_map = '<c-p>'
@@ -105,8 +110,9 @@ autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isT
 map <C-n> :NERDTreeToggle<CR>
 
 " Prettier
-let g:prettier#autoformat = 1
-let g:prettier#autoformat_require_pragma = 0
+command! -nargs=0 Prettier :CocCommand prettier.formatFile
+vmap <leader>f <Plug>(coc-format-selected)
+nmap <leader>f <Plug>(coc-format-selected)
 
 " Auto close tag options
 " filenames like *.xml, *.html, *.xhtml, ...

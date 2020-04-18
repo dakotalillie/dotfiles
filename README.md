@@ -9,6 +9,7 @@ have any, by running the following:
 ```bash
 mv ~/.vimrc ~/.vimrc.bak
 mv ~/.tmux.conf ~/.tmux.conf.bak
+mv ~/.config/nvim/coc-settings.json ~/.config/nvim/coc-settings.json.bak
 ```
 
 Navigate to the directory root for this repo. Then run:
@@ -16,6 +17,7 @@ Navigate to the directory root for this repo. Then run:
 ```bash
 ln -sf "$(pwd)/.vimrc" ~/.vimrc
 ln -sf "$(pwd)/.tmux.conf" ~/.tmux.conf
+ln -sf "$(pwd)/coc-settings.json" ~/.config/nvim/coc-settings.json
 ```
 
 This will create symbolic links to each of the files in your
@@ -44,7 +46,7 @@ source ~/.vimrc
 ### Installing Vim plugins
 
 You'll need to download Vim-Plug by following the instructions
-[here](https://github.com/junegunn/vim-plug). 
+[here](https://github.com/junegunn/vim-plug).
 
 Open vim with:
 
@@ -108,4 +110,3 @@ And add this to your `.zshrc`:
 ```bash
 export PATH="/usr/local/opt/grep/libexec/gnubin:$PATH"
 ```
-
