@@ -55,6 +55,12 @@ Plug 'alvan/vim-closetag'
 " Smooth scrolling
 Plug 'yuttie/comfortable-motion.vim'
 
+" Icons for Nerd tree
+Plug 'ryanoasis/vim-devicons'
+
+" Coloring for Nerd tree icons
+Plug 'tiagofumo/vim-nerdtree-syntax-highlight'
+
 call plug#end()
 
 "Credit joshdick
@@ -76,6 +82,24 @@ endif
 
 colorscheme onedark
 let g:onedark_terminal_italics = 0
+
+" Fix an issue where certain symbols on the current cursor line would not be highlighted
+" https://github.com/neovim/neovim/issues/9019#issuecomment-521532103
+function! s:CustomizeColors()
+  if has('guirunning') || has('termguicolors')
+    let cursorline_gui=''
+    let cursorline_cterm='ctermfg=white'
+  else
+    let cursorline_gui='guifg=white'
+    let cursorline_cterm=''
+  endif
+  exec 'hi CursorLine ' . cursorline_gui . ' ' . cursorline_cterm 
+endfunction
+
+augroup OnColorScheme
+  autocmd!
+  autocmd ColorScheme,BufEnter,BufWinEnter * call s:CustomizeColors()
+augroup END
 
 let g:lightline = {
   \ 'colorscheme': 'onedark',
@@ -109,6 +133,10 @@ hi DiffDelete ctermbg=235 ctermfg=131 cterm=reverse guibg=#262626 guifg=#af5f5f 
 " NerdTree
 autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
 map <C-n> :NERDTreeToggle<CR>
+let NERDTreeShowHidden=1
+let NERDTreeIgnore=['\.git$']
+let NERDTreeShowLineNumbers=1
+let g:NERDTreeWinSize=50
 
 " Prettier
 command! -nargs=0 Prettier :CocCommand prettier.formatFile
