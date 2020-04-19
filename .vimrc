@@ -243,6 +243,8 @@ set autoread
 " Enable copying from vim
 set clipboard+=unnamedplus
 
+" Open new vertical splits to the right instead of the left
+set splitright
 
 
 " All of the following are required by COC
