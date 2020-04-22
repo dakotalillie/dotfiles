@@ -7,5 +7,6 @@
     "json",
     "css",
     "markdown"
-  ]
+  ],
+  "prettier.proseWrap": "always"
 }

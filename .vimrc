@@ -16,6 +16,9 @@ Plug 'tpope/vim-fugitive'
 " Git gutter
 Plug 'airblade/vim-gitgutter'
 
+" Distraction-free editing
+Plug 'junegunn/goyo.vim'
+
 " Surroundings
 Plug 'tpope/vim-surround'
 
@@ -113,11 +116,15 @@ let g:coc_global_extensions = [
   \ 'coc-json',
   \ ]
 
+" Goyo
+let g:goyo_width = 100
+let g:goyo_linenr = 1
+
 " Ctrl-P config
 let g:ctrlp_map = '<c-p>'
 let g:ctrlp_cmd = 'CtrlP'
 let g:ctrlp_working_path_mode = 'ra'
-let g:ctrlp_max_files=0
+let g:ctrlp_max_files = 0
 let g:ctrlp_cache_dir = $HOME . '/.cache/ctrlp'
 if executable('ag')
   " Use ag in CtrlP for listing files. Lightning fast, respects .gitignore
