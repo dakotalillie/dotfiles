@@ -40,6 +40,9 @@ Plug 'christoomey/vim-tmux-navigator'
 " Theme
 Plug 'joshdick/onedark.vim'
 
+" Whitespace removal
+Plug 'ntpeters/vim-better-whitespace'
+
 " Auto pairs
 Plug 'jiangmiao/auto-pairs'
 
@@ -61,10 +64,17 @@ Plug 'yuttie/comfortable-motion.vim'
 " Icons for Nerd tree
 Plug 'ryanoasis/vim-devicons'
 
+" Wiki
+Plug 'vimwiki/vimwiki'
+
 " Coloring for Nerd tree icons
 Plug 'tiagofumo/vim-nerdtree-syntax-highlight'
 
 call plug#end()
+
+" Enable italics
+let &t_8f="\<Esc>[38;2;%lu;%lu;%lum"
+let &t_8b="\<Esc>[48;2;%lu;%lu;%lum"
 
 "Credit joshdick
 "Use 24-bit (true-color) mode in Vim/Neovim when outside tmux.
@@ -84,7 +94,7 @@ endif
 " endif
 
 colorscheme onedark
-let g:onedark_terminal_italics = 0
+let g:onedark_terminal_italics = 1
 
 " Fix an issue where certain symbols on the current cursor line would not be highlighted
 " https://github.com/neovim/neovim/issues/9019#issuecomment-521532103
@@ -96,7 +106,7 @@ function! s:CustomizeColors()
     let cursorline_gui='guifg=white'
     let cursorline_cterm=''
   endif
-  exec 'hi CursorLine ' . cursorline_gui . ' ' . cursorline_cterm 
+  exec 'hi CursorLine ' . cursorline_gui . ' ' . cursorline_cterm
 endfunction
 
 augroup OnColorScheme
@@ -182,7 +192,21 @@ let g:closetag_regions = {
 let g:closetag_shortcut = '>'
 
 " Add > at current position without closing the current tag, default is ''
-let g:closetag_close_shortcut = '<leader>>' 
+let g:closetag_close_shortcut = '<leader>>'
+
+" Customize VimWiki to use markdown instead of default syntax
+let g:vimwiki_list = [{'path': '~/vimwiki/',
+                      \ 'syntax': 'markdown', 'ext': '.md'}]
+
+" Make sure vim only treats markdown files in the wiki directory as vimwiki files
+let g:vimwiki_global_ext = 0
+
+" Automatic whitespace removal
+let g:better_whitespace_enabled = 1
+let g:strip_whitespace_on_save = 1
+let g:strip_whitespace_confirm = 0
+" Remove markdown from the list of blacklisted filetypes
+let g:better_whitespace_filetypes_blacklist=['diff', 'gitcommit', 'unite', 'qf', 'help']
 
 " Syntax highlighting
 syntax on
@@ -194,7 +218,7 @@ set number
 set relativenumber
 
 " Break lines at word (requires Wrap lines)
-set linebreak	
+set linebreak
 
 " Wrap-broken line prefix
 set showbreak=+++
@@ -207,7 +231,7 @@ set showmatch
 
 " Disable beeping/flashing on errors
 set noerrorbells visualbell t_vb=
- 
+
 " Highlight all search results
 set hlsearch
 
@@ -219,7 +243,7 @@ set ignorecase
 
 " Searches for strings incrementally
 set incsearch
- 
+
 " Auto-indent new lines
 set autoindent
 
@@ -237,7 +261,7 @@ set smarttab
 
 " Number of spaces per Tab
 set softtabstop=2
- 
+
 " Number of undo levels
 set undolevels=1000
 
@@ -252,6 +276,10 @@ set clipboard+=unnamedplus
 
 " Open new vertical splits to the right instead of the left
 set splitright
+
+" Requested by VimWiki
+set nocompatible
+filetype plugin on
 
 
 " All of the following are required by COC
