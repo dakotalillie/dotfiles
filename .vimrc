@@ -66,6 +66,10 @@ Plug 'vimwiki/vimwiki'
 
 call plug#end()
 
+" Set space as leader
+let mapleader = " "
+nnoremap <SPACE> <Nop>
+
 " Enable italics
 let &t_8f="\<Esc>[38;2;%lu;%lu;%lum"
 let &t_8b="\<Esc>[48;2;%lu;%lu;%lum"
