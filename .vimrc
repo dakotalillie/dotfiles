@@ -61,14 +61,8 @@ Plug 'alvan/vim-closetag'
 " Smooth scrolling
 Plug 'yuttie/comfortable-motion.vim'
 
-" Icons for Nerd tree
-Plug 'ryanoasis/vim-devicons'
-
 " Wiki
 Plug 'vimwiki/vimwiki'
-
-" Coloring for Nerd tree icons
-Plug 'tiagofumo/vim-nerdtree-syntax-highlight'
 
 call plug#end()
 
@@ -159,6 +153,9 @@ let g:NERDTreeWinSize=50
 command! -nargs=0 Prettier :CocCommand prettier.formatFile
 vmap <leader>f <Plug>(coc-format-selected)
 nmap <leader>f <Plug>(coc-format-selected)
+
+" Tmux Navigator
+let g:tmux_navigator_disable_when_zoomed = 1
 
 " Auto close tag options
 " filenames like *.xml, *.html, *.xhtml, ...
@@ -251,7 +248,7 @@ set autoindent
 set expandtab
 
 " Number of auto-indent spaces
-set shiftwidth=2
+set shiftwidth=4
 
 " Enable smart-indent
 set smartindent
@@ -260,7 +257,7 @@ set smartindent
 set smarttab
 
 " Number of spaces per Tab
-set softtabstop=2
+set softtabstop=4
 
 " Number of undo levels
 set undolevels=1000
