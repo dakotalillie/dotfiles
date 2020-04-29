@@ -59,7 +59,7 @@ Plug 'neoclide/coc.nvim', { 'branch': 'release' }
 Plug 'alvan/vim-closetag'
 
 " Smooth scrolling
-Plug 'yuttie/comfortable-motion.vim'
+Plug 'psliwka/vim-smoothie'
 
 " Wiki
 Plug 'vimwiki/vimwiki'
