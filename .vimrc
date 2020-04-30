@@ -34,6 +34,9 @@ Plug 'itchyny/lightline.vim'
 " Code commenting
 Plug 'tpope/vim-commentary'
 
+" Bracket mappings
+Plug 'tpope/vim-unimpaired'
+
 " Tmux integration
 Plug 'christoomey/vim-tmux-navigator'
 
