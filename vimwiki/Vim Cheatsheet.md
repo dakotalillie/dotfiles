@@ -2,15 +2,15 @@
 
 ## Global Search and Replace
 
-Make sure Vim's current working directory is set as the project root. Then run `:vimgrep` to populate
+Make sure Vim's current working directory is set as the project root. Then run `:grep` to populate
 the quickfix list with the files matching the target pattern. For instance, to search for all
 occurrences of the word "Sam" in your project:
 
 ```
-:vimgrep /Sam/gj **/*
+:grep! "Sam"
 ```
 
-The `j` flag tells Vim not to jump to the first match. You can see the matched files by running
+The `!` flag tells Vim not to jump to the first match. You can see the matched files by running
 `:copen`. To run a substitution against the matched files, use the `:cfdo` command. For instance, to
 replace all occurrences of the word "Sam" with the word "Bob", you'd run:
 
