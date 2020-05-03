@@ -94,8 +94,12 @@ if (has("termguicolors"))
 endif
 " endif
 
+" Color scheme
 colorscheme onedark
 let g:onedark_terminal_italics = 1
+let g:lightline = {
+  \ 'colorscheme': 'onedark',
+  \ }
 
 " Fix an issue where certain symbols on the current cursor line would not be highlighted
 " https://github.com/neovim/neovim/issues/9019#issuecomment-521532103
@@ -114,10 +118,6 @@ augroup OnColorScheme
   autocmd!
   autocmd ColorScheme,BufEnter,BufWinEnter * call s:CustomizeColors()
 augroup END
-
-let g:lightline = {
-  \ 'colorscheme': 'onedark',
-  \ }
 
 " coc extensions
 let g:coc_global_extensions = [
@@ -139,7 +139,7 @@ let g:ctrlp_max_files = 0
 let g:ctrlp_cache_dir = $HOME . '/.cache/ctrlp'
 if executable('ag')
   " Use ag over grep
-  set grepprg=ag\ --nogroup\ --nocolor
+  set grepprg=ag\ --nogroup\ --nocolor\ --hidden\ --ignore\ .git
 
   " Use ag in CtrlP for listing files. Lightning fast, respects .gitignore
   " and .agignore. Also ignores .git
@@ -148,6 +148,16 @@ if executable('ag')
   " ag is fast enough that CtrlP doesn't need to cache
   let g:ctrlp_use_caching = 0
 endif
+
+" Shortcut for searching
+nnoremap <leader>\ :silent<SPACE>grep!<SPACE>
+
+" Automatically open quickfix after search
+augroup quickfix
+    autocmd!
+    autocmd QuickFixCmdPost [^l]* cwindow
+    autocmd QuickFixCmdPost l* lwindow
+augroup END
 
 " Diff coloring
 hi DiffAdd ctermbg=235 ctermfg=108 cterm=reverse guibg=#262626 guifg=#87af87 gui=reverse
@@ -165,8 +175,6 @@ let g:NERDTreeWinSize=50
 
 " Prettier
 command! -nargs=0 Prettier :CocCommand prettier.formatFile
-vmap <leader>f <Plug>(coc-format-selected)
-nmap <leader>f <Plug>(coc-format-selected)
 
 " Tmux Navigator
 let g:tmux_navigator_disable_when_zoomed = 1
