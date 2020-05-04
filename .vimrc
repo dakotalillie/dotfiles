@@ -125,6 +125,7 @@ let g:coc_global_extensions = [
   \ 'coc-eslint',
   \ 'coc-prettier',
   \ 'coc-json',
+  \ 'coc-python'
   \ ]
 
 " Goyo
@@ -300,6 +301,9 @@ set clipboard+=unnamedplus
 
 " Open new vertical splits to the right instead of the left
 set splitright
+
+" Open new horizontal splits below rather than above
+set splitbelow
 
 " Requested by VimWiki
 set nocompatible
