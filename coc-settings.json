@@ -8,5 +8,6 @@
     "css",
     "markdown"
   ],
-  "prettier.proseWrap": "always"
+  "prettier.proseWrap": "always",
+  "javascript.suggestionActions.enabled": false
 }
