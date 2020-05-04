@@ -152,6 +152,10 @@ endif
 " Shortcut for searching
 nnoremap <leader>\ :silent<SPACE>grep!<SPACE>
 
+" Quickfix shortcuts
+nnoremap <leader>qo :copen<CR>
+nnoremap <leader>qq :cclose<CR>
+
 " Automatically open quickfix after search
 augroup quickfix
     autocmd!
@@ -201,8 +205,9 @@ let g:closetag_xhtml_filetypes = 'html,jsx,tsx'
 let g:closetag_emptyTags_caseSensitive = 1
 
 " dict
-" Disables auto-close if not in a "valid" region (based on filetype)
+" Disables auto-close if not in a 'valid' region (based on filetype)
 let g:closetag_regions = {
+    \ 'typescriptreact': 'jsxRegion,tsxRegion',
     \ 'typescript.tsx': 'jsxRegion,tsxRegion',
     \ 'javascript.jsx': 'jsxRegion',
     \ }
