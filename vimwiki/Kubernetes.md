@@ -10,10 +10,38 @@
 
 ## Glossary
 
+*Config Map*
+
+A Kubernetes object that is used to provide configuration information for workloads. This can either
+be fine-grained information (a short string) or a composite vlaue in the form of a file. A ConfigMap
+is combined with a Pod right before the Pod is run. It can either create files within the container
+filesystem (one for each key, containing the value), set environment variables within the container,
+or specify command-line arguments for the main process.
+
+*Daemon Set*
+
+A tool for ensuring a copy of a Pod is running across a set of nodes in a Kubernetes cluster.
+Usually, this is desirable when the Pod contains some sort of agent or daemon, hence the name.
+
+*Kubernetes Object*
+
+A RESTful resource contained within Kubernetes. Each Kubernetes object exists at a unique HTTP path;
+for example, `https://your-k8s.com/api/v1/namespaces/default/pods/my-pod`. The `kubectl` command
+makes HTTP requests to these URLs to access the Kubernetes objects that reside at these paths.
+
+Represented as JSON or YAML files. These files are either returned by the server in response to a
+query or posted to the server as part of an API request.
+
 *Deployment* ([source](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/))
 
 An abstraction representing declarative updates for Pods and ReplicaSets. Scaling is accomplished by
 changing the number of replicas in a deployment.
+
+*Job*
+
+A Kubernetes object intended for servicing short-lived, one-off tasks rather than long-running
+processes. It creates Pods that run until successful termination (i.e., exit with 0). Useful for
+database migrations or batch jobs.
 
 *Replica Set* ([source](https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/))
 
@@ -58,6 +86,18 @@ minikube version
 minikube start
 ```
 
+### Stop the cluster
+
+```sh
+minikube stop
+```
+
+### Remove the cluster
+
+```sh
+minikube delete
+```
+
 ## Kubectl
 
 Kubectl is the command line interface for Kubernetes.
@@ -68,7 +108,8 @@ Any of these can be appended with `--help` to get more information on potential 
 options.
 
 ```sh
-kubectl get      # list resources
+kubectl help     # Show documentation
+kubectl get      # List resources
 kubectl describe # Show detailed information about a resource
 kubectl logs     # Print the logs from a container in a pod
 kubectl exec     # Execute a command on a container in a pod
@@ -78,6 +119,12 @@ kubectl exec     # Execute a command on a container in a pod
 
 ```sh
 kubectl version
+```
+
+### Get cluster diagnostic
+
+```sh
+kubectl get componentstatuses
 ```
 
 ### View cluster details
@@ -90,6 +137,14 @@ kubectl cluster-info
 
 ```sh
 kubectl get nodes
+```
+
+### View node details
+
+The following gets a detailed description for node `node-1`
+
+```sh
+kubectl describe nodes node-1
 ```
 
 ### Create a deployment
@@ -152,6 +207,9 @@ kubectl expose deployment/kubernetes-bootcamp --type="NodePort" --port 8080
 
 ### Apply a label to a Pod
 
+To overwrite an existing label, use the `--overwrite` flag. Labels can also be deleted by added a
+dash suffix (for example, `app-`)
+
 ```sh
 kubectl label pod $POD_NAME app=v1
 ```
@@ -180,3 +238,335 @@ kubectl rollout status deployments/kubernetes-bootcamp
 kubectl rollout undo deployments/kubernetes-bootcamp
 ```
 
+### Create a context
+
+This creates a new context called `my-context` with a default namespace of `mystuff`. It will get
+recorded in a `kubectl` configuration file, usually located at `$HOME/.kube/config`.
+
+```sh
+kubectl config set-context my-context --namespace=mystuff
+```
+
+### Use a previously created context
+
+Assuming the `my-context` context has previously been created, you can activate it by running:
+
+```sh
+kubectl config use-context my-context
+```
+
+### Create/update a Kubernetes object from a file
+
+Assuming the configuration [for](for) the object is contained in `obj.yaml`
+
+```sh
+kubectl apply -f obj.yaml
+```
+
+### Delete a Kubernetes object
+
+```sh
+kubectl delete -f obj.yaml
+```
+
+### Imperatively run a pod
+
+This creates a pod called `kuard` using the image `kuard-amd64:1`.
+
+```sh
+kubectl run kuard --image=kuard-amd64:1
+```
+
+### Set up port forwarding
+
+Port-forwarding can be used to access a pod for debugging. Here, we forward port 8080 on our host to
+port 8080 within the `kuard` pod:
+
+```sh
+kubectl port-forward kuard 8080:8080
+```
+
+### Copy files to and from containers
+
+This copies a file from a pod with a single container to the local file system (in this case,
+`capture3.txt`)
+
+```sh
+kubectl cp <pod-name>:/captures/capture3.txt ./capture3.txt
+```
+
+This copies a file from the local filesystem into a pod with a single container (note that this is
+generally an anti-pattern):
+
+```sh
+kubectl cp $HOME/config.txt <pod-name>:/config.txt
+```
+
+### Using label selectors
+
+These examples are for pods but the same thing applies to deployments and other Kubernetes objects
+
+```sh
+kubectl get pods --selector="app=bandicoot,ver=2"
+```
+
+```sh
+kubectl get pods --selector="app in (alpaca,bandicoot)"
+```
+
+### Delete all objects of a particular type
+
+The `--selector` flag can also come in useful
+
+```sh
+kubectl delete deployments --all
+```
+
+### Create a config map
+
+Assuming a file called `my-config` exists on the filesystem:
+
+```sh
+kubectl create configmap my-config \
+  --from-file=my-config.txt \
+  --from-literal=extra-param=extra-value \
+  --from-literal=another-param=another-value
+```
+
+### Create a secret
+
+Assuming files called `kuard.crt` and `kuard.key` exist on the filesystem:
+
+```sh
+kubectl create secret generic kuard-tls \
+  --from-file=kuard.crt \
+  --from-file=kuard.key
+```
+
+---
+
+## Sample manifest files
+
+### Basic manifest file
+
+```yaml
+# kuard-pod.yaml
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: kuard
+spec:
+  containers:
+    image: kuard-amd64:1
+    name: kuard
+    ports:
+      - containerPort: 8080
+        name: http
+        protocol: TCP
+```
+
+### Manifest file with a liveness probe
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: kuard
+spec:
+  containers:
+    - image: kuard-amd64:1
+      name: kuard
+      livenessProbe:
+        httpGet:
+          path: /healthy
+          port: 8080
+        initialDelaySeconds: 5
+        timeoutSeconds: 1
+        periodSeconds: 10
+        failureThreshold: 3
+      ports:
+        - containerPort: 8080
+          name: http
+          protocol: TCP
+```
+
+### Manifest file with resource requests and limits
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: kuard
+spec:
+  containers:
+    - image: kuard-amd64:1
+      name: kuard
+      resources:
+        requests:
+          cpu: "500m"
+          memory: "128Mi"
+        limits:
+          cpu: "1000m"
+          memory: "256Mi"
+      ports:
+        - containerPort: 8080
+          name: http
+          protocol: TCP
+```
+
+### Manifest file with a volume (persisted storage)
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: kuard
+spec:
+  volumes:
+    - name: "kuard-data"
+      hostPath:
+        path: "/var/lib/kuard"
+  containers:
+    - image: kuard-amd64:1
+      name: kuard
+      volumeMounts:
+        - mountPath: "/data"
+          name: "kuard-data"
+      ports:
+        - containerPort: 8080
+          name: http
+          protocol: TCP
+```
+
+### Full manifest file for pod
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: kuard
+spec:
+  volumes:
+    - name: "kuard-data"
+      nfs:
+        server: my.nfs.server.local
+        path: "/exports"
+  containers:
+    - image: kuard-amd64:1
+      name: kuard
+      ports:
+        - containerPort: 8080
+          name: http
+          protocol: TCP
+      resources:
+        requests:
+          cpu: "500m"
+          memory: "128Mi"
+        limits:
+          cpu: "1000m"
+          memory: "256Mi"
+      volumeMounts:
+        - mountPath: "/data"
+          name: "kuard-data"
+      livenessProbe:
+        httpGet:
+          path: /healthy
+          port: 8080
+        initialDelaySeconds: 5
+        timeoutSeconds: 1
+        periodSeconds: 10
+        failureThreshold: 3
+      readinessProbe:
+        httpGet:
+          path: /ready
+          port: 8080
+        initialDelaySeconds: 30
+        timeoutSeconds: 1
+        periodSeconds: 10
+        failureThreshold: 3
+```
+
+### Minimal ReplicaSet definition
+
+```yaml
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: kuard
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kuard
+      version: "2"
+  template:
+    metadata:
+      labels:
+        app: kuard
+        version: "2"
+    spec:
+      containers:
+        - name: kuard
+          image: "kuard-amd64:1"
+```
+
+### Using a config map
+
+This assumes one has previously been created using the `Create a config map` command.
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: kuard-config
+spec:
+  containers:
+    - name: test-container
+      image: kuard-amd64:1
+      command:
+        - "/kuard"
+        - "$(EXTRA_PARAM)"
+      env:
+        - name: ANOTHER_PARAM
+          valueFrom:
+            configMapKeyRef:
+              name: my-config
+              key: another-param
+        - name: EXTRA_PARAM
+          valueFrom:
+            configMapKeyRef:
+              name: my-config
+              key: extra-param
+      volumeMounts:
+        - name: config-volume
+          mountPath:  /config
+  volumes:
+    - name: config-volume
+      configMap:
+        name: my-config
+  restartPolicy: Never
+```
+
+### Manifest file with secrets
+
+This assumes the secret has already been created
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: kuard-tls
+spec:
+  containers:
+    - name: kuard-tls
+      image: kuard-amd64:1
+      volumeMounts:
+        - name: tls-certs
+          mountPath: "/tls"
+          readOnly: true
+  volumes:
+    - name: tls-certs
+      secret:
+        secretName: kuard-tls
+```

@@ -1,77 +1,68 @@
-" Plugin manager
+" Initialize plugin manager
 if empty(glob('~/.vim/autoload/plug.vim'))
   silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
     \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
   autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
 endif
 
+" Plugins
 call plug#begin('~/.vim/plugged')
-
-" Defaults
-Plug 'tpope/vim-sensible'
-
-" Git stuff
-Plug 'tpope/vim-fugitive'
-
-" Git gutter
-Plug 'airblade/vim-gitgutter'
-
-" Distraction-free editing
-Plug 'junegunn/goyo.vim'
-
-" Surroundings
-Plug 'tpope/vim-surround'
-
-" Fuzzy finder
-Plug 'ctrlpvim/ctrlp.vim'
-
-" Syntax highlighting
-Plug 'sheerun/vim-polyglot'
-
-" Status line
-Plug 'itchyny/lightline.vim'
-
-" Code commenting
-Plug 'tpope/vim-commentary'
-
-" Bracket mappings
-Plug 'tpope/vim-unimpaired'
-
-" Tmux integration
-Plug 'christoomey/vim-tmux-navigator'
-
-" Theme
-Plug 'joshdick/onedark.vim'
-
-" Whitespace removal
-Plug 'ntpeters/vim-better-whitespace'
-
-" Auto pairs
-Plug 'jiangmiao/auto-pairs'
-
-" Nerd tree
-Plug 'preservim/nerdtree'
-
-" Nerd tree git
-Plug 'Xuyuanp/nerdtree-git-plugin'
-
-" Intellisense
-Plug 'neoclide/coc.nvim', { 'branch': 'release' }
-
-" Auto close tags
-Plug 'alvan/vim-closetag'
-
-" Smooth scrolling
-Plug 'psliwka/vim-smoothie'
-
-" Wiki
-Plug 'vimwiki/vimwiki'
-
+Plug 'tpope/vim-sensible' " Defaults
+Plug 'tpope/vim-fugitive' " Git stuff
+Plug 'airblade/vim-gitgutter' " Git gutter
+Plug 'tpope/vim-surround' " Surrounds
+Plug 'ctrlpvim/ctrlp.vim' " Fuzzy finder
+Plug 'sheerun/vim-polyglot' " Syntax highlighting
+Plug 'itchyny/lightline.vim' " Status line
+Plug 'tpope/vim-commentary' " Code commenting
+Plug 'tpope/vim-unimpaired' " Bracket mappings
+Plug 'christoomey/vim-tmux-navigator' " Tmux integration
+Plug 'joshdick/onedark.vim' " Theme
+Plug 'ntpeters/vim-better-whitespace' " Whitespace highlighting and removal
+Plug 'jiangmiao/auto-pairs' " Auto pairs
+Plug 'preservim/nerdtree' " Nerd tree
+Plug 'Xuyuanp/nerdtree-git-plugin' " Nerd tree git
+Plug 'neoclide/coc.nvim', { 'branch': 'release' } " Intellisense
+Plug 'alvan/vim-closetag' " Auto close tags
+Plug 'psliwka/vim-smoothie' " Smooth scrolling
+Plug 'vimwiki/vimwiki' " Wiki
+Plug 'tpope/vim-sleuth' " Indentation
 call plug#end()
 
 " Set space as leader
 let mapleader = " "
 nnoremap <SPACE> <Nop>
+
+" Set comma as local leader
+let maplocalleader = ","
+
+" Easy editing of vimrc
+nnoremap <leader>ev :tabe ~/.vimrc<CR>
+
+" Add command for reloading lightline after re-sourcing vimrc
+command! LightlineReload call LightlineReload()
+
+function! LightlineReload()
+  call lightline#init()
+  call lightline#colorscheme()
+  call lightline#update()
+endfunction
+
+" Run the command after sroucing
+augroup ReloadLightline
+  autocmd!
+  autocmd SourcePost *.vimrc LightlineReload
+augroup end
+
+if get(g:, '_has_set_default_indent_settings', 0) == 0
+  " Set the indenting level to 2 spaces for the following file types.
+  autocmd FileType typescript,javascript,jsx,tsx,css,html,ruby,elixir,kotlin,vim,plantuml
+    \ setlocal expandtab tabstop=2 shiftwidth=2
+  set expandtab
+  set tabstop=4
+  set shiftwidth=4
+  let g:_has_set_default_indent_settings = 1
+endif
 
 " Enable italics
 let &t_8f="\<Esc>[38;2;%lu;%lu;%lum"
@@ -153,6 +144,13 @@ endif
 " Shortcut for searching
 nnoremap <leader>\ :silent<SPACE>grep!<SPACE>
 
+" Shorcuts for tabs
+nnoremap <leader>tn :tabn<CR>
+nnoremap <leader>tp :tabp<CR>
+
+" Replacement for <C-i>, since it is the same as <TAB> and used by COC
+nnoremap <C-l> <C-i>
+
 " Quickfix shortcuts
 nnoremap <leader>qo :copen<CR>
 nnoremap <leader>qq :cclose<CR>
@@ -170,7 +168,10 @@ hi DiffChange ctermbg=235 ctermfg=103 cterm=reverse guibg=#262626 guifg=#8787af 
 hi DiffDelete ctermbg=235 ctermfg=131 cterm=reverse guibg=#262626 guifg=#af5f5f gui=reverse
 
 " NerdTree
-autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
+augroup NerdTreeOnQuit
+  autocmd!
+  autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
+augroup END
 map <C-n> :NERDTreeToggle<CR>
 map <leader>n :NERDTreeFind<CR>
 let NERDTreeShowHidden=1
@@ -272,17 +273,11 @@ set autoindent
 " Use spaces instead of tabs
 set expandtab
 
-" Number of auto-indent spaces
-set shiftwidth=4
-
 " Enable smart-indent
 set smartindent
 
 " Enable smart-tabs
 set smarttab
-
-" Number of spaces per Tab
-set softtabstop=4
 
 " Number of undo levels
 set undolevels=1000
@@ -377,7 +372,10 @@ function! s:show_documentation()
 endfunction
 
 " Highlight the symbol and its references when holding the cursor.
-autocmd CursorHold * silent call CocActionAsync('highlight')
+augroup CocHoldHighlight
+  autocmd!
+  autocmd CursorHold * silent call CocActionAsync('highlight')
+augroup end
 
 " Symbol renaming.
 nmap <leader>rn <Plug>(coc-rename)
