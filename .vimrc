@@ -75,13 +75,27 @@ nnoremap <space> <nop>
 " Easy editing of vimrc
 nnoremap <leader>ev :tabe ~/.vimrc<cr>
 " Quickfix shortcuts
-nnoremap <leader>qo :copen<CR>
-nnoremap <leader>qq :cclose<CR>
+nnoremap <leader>qo :copen<cr>
+nnoremap <leader>qq :cclose<cr>
 " Shorcuts for tabs
-nnoremap <leader>tn :tabn<CR>
-nnoremap <leader>tp :tabp<CR>
+nnoremap <leader>tn :tabn<cr>
+nnoremap <leader>tp :tabp<cr>
 " Replacement for <C-i>, since it is the same as <TAB> and used by COC
 nnoremap <C-l> <tab>
+" Easy toggling
+nnoremap <leader>z za
+nnoremap <leader>Z :call <SID>ToggleGlobalFold()<cr>
+function! s:ToggleGlobalFold()
+  let currentLineHasFold = foldlevel('.') != 0
+  let currentFoldIsOpen = foldclosed('.') == -1
+  if currentLineHasFold && currentFoldIsOpen
+    " Close all folds
+    normal! zM
+  else
+    " Open all folds
+    normal! zR
+  endif
+endfunction
 " Automatically open quickfix after search
 augroup quickfix
     autocmd!
