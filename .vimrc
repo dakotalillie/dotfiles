@@ -81,7 +81,7 @@ nnoremap <leader>qq :cclose<CR>
 nnoremap <leader>tn :tabn<CR>
 nnoremap <leader>tp :tabp<CR>
 " Replacement for <C-i>, since it is the same as <TAB> and used by COC
-nnoremap <C-l> <C-i>
+nnoremap <C-l> <tab>
 " Automatically open quickfix after search
 augroup quickfix
     autocmd!
