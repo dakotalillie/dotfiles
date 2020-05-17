@@ -1,11 +1,10 @@
+" Plugins {{{
 " Initialize plugin manager
 if empty(glob('~/.vim/autoload/plug.vim'))
   silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
     \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
   autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
 endif
-
-" Plugins
 call plug#begin('~/.vim/plugged')
 Plug 'tpope/vim-sensible' " Defaults
 Plug 'tpope/vim-fugitive' " Git stuff
@@ -28,32 +27,15 @@ Plug 'psliwka/vim-smoothie' " Smooth scrolling
 Plug 'vimwiki/vimwiki' " Wiki
 Plug 'tpope/vim-sleuth' " Indentation
 call plug#end()
-
-" Set space as leader
-let mapleader = " "
-nnoremap <SPACE> <Nop>
-
-" Set comma as local leader
-let maplocalleader = ","
-
-" Easy editing of vimrc
-nnoremap <leader>ev :tabe ~/.vimrc<CR>
-
-" Add command for reloading lightline after re-sourcing vimrc
-command! LightlineReload call LightlineReload()
-
-function! LightlineReload()
-  call lightline#init()
-  call lightline#colorscheme()
-  call lightline#update()
-endfunction
-
-" Run the command after sroucing
-augroup ReloadLightline
-  autocmd!
-  autocmd SourcePost *.vimrc LightlineReload
-augroup end
-
+" }}}
+" Styles {{{
+colorscheme onedark
+let g:lightline = { 'colorscheme': 'onedark' }
+let g:onedark_terminal_italics = 1
+" Normally, vim-sleuth will infer the correct indentation. However, in cases where the desired
+" indentation cannot be inferred, vim-sleuth normally defaults to 8 spaces, which is... not great.
+" This changes that, so that the default is set to 2 spaces for certain filetypes, and 4 spaces for
+" everything else.
 if get(g:, '_has_set_default_indent_settings', 0) == 0
   " Set the indenting level to 2 spaces for the following file types.
   autocmd FileType typescript,javascript,jsx,tsx,css,html,ruby,elixir,kotlin,vim,plantuml
@@ -63,16 +45,13 @@ if get(g:, '_has_set_default_indent_settings', 0) == 0
   set shiftwidth=4
   let g:_has_set_default_indent_settings = 1
 endif
-
 " Enable italics
 let &t_8f="\<Esc>[38;2;%lu;%lu;%lum"
 let &t_8b="\<Esc>[48;2;%lu;%lu;%lum"
-
 "Credit joshdick
 "Use 24-bit (true-color) mode in Vim/Neovim when outside tmux.
 "If you're using tmux version 2.2 or later, you can remove the outermost $TMUX check and use tmux's 24-bit color support
 "(see < http://sunaku.github.io/tmux-24bit-color.html#usage > for more information.)
-" if (empty($TMUX))
 if (has("nvim"))
   "For Neovim 0.1.3 and 0.1.4 < https://github.com/neovim/neovim/pull/2198 >
   let $NVIM_TUI_ENABLE_TRUE_COLOR=1
@@ -83,34 +62,108 @@ endif
 if (has("termguicolors"))
   set termguicolors
 endif
-" endif
-
-" Color scheme
-colorscheme onedark
-let g:onedark_terminal_italics = 1
-let g:lightline = {
-  \ 'colorscheme': 'onedark',
-  \ }
-
-" Fix an issue where certain symbols on the current cursor line would not be highlighted
-" https://github.com/neovim/neovim/issues/9019#issuecomment-521532103
-function! s:CustomizeColors()
-  if has('guirunning') || has('termguicolors')
-    let cursorline_gui=''
-    let cursorline_cterm='ctermfg=white'
-  else
-    let cursorline_gui='guifg=white'
-    let cursorline_cterm=''
-  endif
-  exec 'hi CursorLine ' . cursorline_gui . ' ' . cursorline_cterm
-endfunction
-
-augroup OnColorScheme
-  autocmd!
-  autocmd ColorScheme,BufEnter,BufWinEnter * call s:CustomizeColors()
+" Diff coloring
+hi DiffAdd ctermbg=235 ctermfg=108 cterm=reverse guibg=#262626 guifg=#87af87 gui=reverse
+hi DiffChange ctermbg=235 ctermfg=103 cterm=reverse guibg=#262626 guifg=#8787af gui=reverse
+hi DiffDelete ctermbg=235 ctermfg=131 cterm=reverse guibg=#262626 guifg=#af5f5f gui=reverse
+" }}}
+" Mappings {{{
+" Leader mappings
+let mapleader = " "
+let maplocalleader = ","
+nnoremap <space> <nop>
+" Easy editing of vimrc
+nnoremap <leader>ev :tabe ~/.vimrc<cr>
+" Quickfix shortcuts
+nnoremap <leader>qo :copen<CR>
+nnoremap <leader>qq :cclose<CR>
+" Shorcuts for tabs
+nnoremap <leader>tn :tabn<CR>
+nnoremap <leader>tp :tabp<CR>
+" Replacement for <C-i>, since it is the same as <TAB> and used by COC
+nnoremap <C-l> <C-i>
+" Automatically open quickfix after search
+augroup quickfix
+    autocmd!
+    autocmd QuickFixCmdPost [^l]* cwindow
+    autocmd QuickFixCmdPost l* lwindow
 augroup END
-
-" coc extensions
+" Grep operator {{{
+" g@ calls the function assigned to operatorfunc as an operator
+" <SID> allows for referencing a value that's scoped to the current script
+nnoremap <leader>g :set operatorfunc=<SID>GrepOperator<cr>g@
+" <c-u> means 'delete from the cursor to the beginning of the line', removing the '<,'> that
+" automaticaly gets added by vim to indicate the operation should apply to the selected text.
+" visualmode() is a built-in function returning a one-character string representing the type of
+" visual mode used (characterwise, linewise, blockwise).
+vnoremap <leader>g :<c-u>call <SID>GrepOperator(visualmode())<cr>
+" The s: prefix places this in the current script's namespace
+function! s:GrepOperator(type)
+  let savedUnnamedRegister = @@
+  if a:type ==# 'v' " we're in characterwise visual mode
+    normal! `<v`>y
+  elseif a:type ==# 'char' " we're in normal mode using a characterwise motion
+    normal! `[v`]y
+  else " ignore linewise and blockwise motions
+    return
+  endif
+  silent execute "grep! " . shellescape(@@)
+  copen
+  let @@ = savedUnnamedRegister
+endfunction
+" }}}
+" }}}
+" Settings {{{
+syntax on " Syntax highlighting
+set number " Show line numbers
+set relativenumber " Relative line numbers
+set linebreak " Break lines at word (requires Wrap lines)
+set showbreak=+++ " Wrap-broken line prefix
+set textwidth=100 " Line wrap (number of cols)
+set showmatch " Highlight matching brace
+set noerrorbells visualbell t_vb= " Disable beeping/flashing on errors
+set hlsearch " Highlight all search results
+set smartcase " Enable smart-case search
+set ignorecase " Always case-insensitive
+set incsearch " Searches for strings incrementally
+set autoindent " Auto-indent new lines
+set expandtab " Use spaces instead of tabs
+set smartindent " Enable smart-indent
+set smarttab " Enable smart-tabs
+set undolevels=1000 " Number of undo levels
+set backspace=indent,eol,start " Backspace behaviour
+set autoread " Reload files when they change on disk
+set clipboard+=unnamedplus " Enable copying from vim
+set splitright " Open new vertical splits to the right instead of the left
+set splitbelow " Open new horizontal splits below rather than above
+set nocompatible " Requested by VimWiki
+filetype plugin on
+augroup VimFileSettings
+  autocmd!
+  autocmd FileType vim set foldmethod=marker | set foldlevelstart=0
+augroup end
+" }}}
+" Plugin settings {{{
+" Better whitespace {{{
+let g:better_whitespace_enabled = 1
+let g:strip_whitespace_on_save = 1
+let g:strip_whitespace_confirm = 0
+let g:better_whitespace_filetypes_blacklist=['diff', 'gitcommit', 'unite', 'qf', 'help']
+" }}}
+" Closetag {{{
+let g:closetag_filenames = '*.html,*.jsx,*.tsx' " filenames where the plugin is enabled.
+let g:closetag_xhtml_filenames = '*.html,*.jsx,*.tsx' " make non-closing tags self-closing.
+let g:closetag_filetypes = 'html,jsx,tsx' " file types where the plugin is enabled.
+let g:closetag_xhtml_filetypes = 'html,jsx,tsx' " make non-closing tags self-closing.
+let g:closetag_emptyTags_caseSensitive = 1 " make non-closing tags case-sensitive (e.g. `<Link>` will be closed while`<link>` won't.)
+" Disable auto-close if not in a 'valid' region (based on filetype)
+let g:closetag_regions = {
+  \ 'typescriptreact': 'jsxRegion,tsxRegion',
+  \ 'typescript.tsx': 'jsxRegion,tsxRegion',
+  \ 'javascript.jsx': 'jsxRegion',
+  \ }
+" }}}
+" CoC {{{
 let g:coc_global_extensions = [
   \ 'coc-tsserver',
   \ 'coc-eslint',
@@ -118,212 +171,16 @@ let g:coc_global_extensions = [
   \ 'coc-json',
   \ 'coc-python'
   \ ]
-
-" Goyo
-let g:goyo_width = 100
-let g:goyo_linenr = 1
-
-" Ctrl-P config
-let g:ctrlp_map = '<c-p>'
-let g:ctrlp_cmd = 'CtrlP'
-let g:ctrlp_working_path_mode = 'ra'
-let g:ctrlp_max_files = 0
-let g:ctrlp_cache_dir = $HOME . '/.cache/ctrlp'
-if executable('ag')
-  " Use ag over grep
-  set grepprg=ag\ --nogroup\ --nocolor\ --hidden\ --ignore\ .git
-
-  " Use ag in CtrlP for listing files. Lightning fast, respects .gitignore
-  " and .agignore. Also ignores .git
-  let g:ctrlp_user_command = 'ag %s -l --hidden --ignore .git --nocolor -g ""'
-
-  " ag is fast enough that CtrlP doesn't need to cache
-  let g:ctrlp_use_caching = 0
-endif
-
-" Shortcut for searching
-nnoremap <leader>\ :silent<SPACE>grep!<SPACE>
-
-" Shorcuts for tabs
-nnoremap <leader>tn :tabn<CR>
-nnoremap <leader>tp :tabp<CR>
-
-" Replacement for <C-i>, since it is the same as <TAB> and used by COC
-nnoremap <C-l> <C-i>
-
-" Quickfix shortcuts
-nnoremap <leader>qo :copen<CR>
-nnoremap <leader>qq :cclose<CR>
-
-" Automatically open quickfix after search
-augroup quickfix
-    autocmd!
-    autocmd QuickFixCmdPost [^l]* cwindow
-    autocmd QuickFixCmdPost l* lwindow
-augroup END
-
-" Diff coloring
-hi DiffAdd ctermbg=235 ctermfg=108 cterm=reverse guibg=#262626 guifg=#87af87 gui=reverse
-hi DiffChange ctermbg=235 ctermfg=103 cterm=reverse guibg=#262626 guifg=#8787af gui=reverse
-hi DiffDelete ctermbg=235 ctermfg=131 cterm=reverse guibg=#262626 guifg=#af5f5f gui=reverse
-
-" NerdTree
-augroup NerdTreeOnQuit
-  autocmd!
-  autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
-augroup END
-map <C-n> :NERDTreeToggle<CR>
-map <leader>n :NERDTreeFind<CR>
-let NERDTreeShowHidden=1
-let NERDTreeIgnore=['\.git$', '.DS_Store']
-let NERDTreeShowLineNumbers=1
-let g:NERDTreeWinSize=50
-
-" Prettier
-command! -nargs=0 Prettier :CocCommand prettier.formatFile
-
-" Tmux Navigator
-let g:tmux_navigator_disable_when_zoomed = 1
-
-" Auto close tag options
-" filenames like *.xml, *.html, *.xhtml, ...
-" These are the file extensions where this plugin is enabled.
-let g:closetag_filenames = '*.html,*.jsx,*.tsx'
-
-" filenames like *.xml, *.xhtml, ...
-" This will make the list of non-closing tags self-closing in the specified files.
-let g:closetag_xhtml_filenames = '*.html,*.jsx,*.tsx'
-
-" filetypes like xml, html, xhtml, ...
-" These are the file types where this plugin is enabled.
-let g:closetag_filetypes = 'html,jsx,tsx'
-
-" filetypes like xml, xhtml, ...
-" This will make the list of non-closing tags self-closing in the specified files.
-let g:closetag_xhtml_filetypes = 'html,jsx,tsx'
-
-" integer value [0|1]
-" This will make the list of non-closing tags case-sensitive (e.g. `<Link>` will be closed while`<link>` won't.)
-let g:closetag_emptyTags_caseSensitive = 1
-
-" dict
-" Disables auto-close if not in a 'valid' region (based on filetype)
-let g:closetag_regions = {
-    \ 'typescriptreact': 'jsxRegion,tsxRegion',
-    \ 'typescript.tsx': 'jsxRegion,tsxRegion',
-    \ 'javascript.jsx': 'jsxRegion',
-    \ }
-
-" Shortcut for closing tags, default is '>'
-let g:closetag_shortcut = '>'
-
-" Customize VimWiki to use markdown instead of default syntax
-let g:vimwiki_list = [{'path': '~/vimwiki/',
-                      \ 'syntax': 'markdown', 'ext': '.md'}]
-
-" Make sure vim only treats markdown files in the wiki directory as vimwiki files
-let g:vimwiki_global_ext = 0
-
-" Automatic whitespace removal
-let g:better_whitespace_enabled = 1
-let g:strip_whitespace_on_save = 1
-let g:strip_whitespace_confirm = 0
-" Remove markdown from the list of blacklisted filetypes
-let g:better_whitespace_filetypes_blacklist=['diff', 'gitcommit', 'unite', 'qf', 'help']
-
-" Syntax highlighting
-syntax on
-
-" Show line numbers
-set number
-
-" Relative line numbers
-set relativenumber
-
-" Break lines at word (requires Wrap lines)
-set linebreak
-
-" Wrap-broken line prefix
-set showbreak=+++
-
-" Line wrap (number of cols)
-set textwidth=100
-
-" Highlight matching brace
-set showmatch
-
-" Disable beeping/flashing on errors
-set noerrorbells visualbell t_vb=
-
-" Highlight all search results
-set hlsearch
-
-" Enable smart-case search
-set smartcase
-
-" Always case-insensitive
-set ignorecase
-
-" Searches for strings incrementally
-set incsearch
-
-" Auto-indent new lines
-set autoindent
-
-" Use spaces instead of tabs
-set expandtab
-
-" Enable smart-indent
-set smartindent
-
-" Enable smart-tabs
-set smarttab
-
-" Number of undo levels
-set undolevels=1000
-
-" Backspace behaviour
-set backspace=indent,eol,start
-
-" Reload files when they change on disk
-set autoread
-
-" Enable copying from vim
-set clipboard+=unnamedplus
-
-" Open new vertical splits to the right instead of the left
-set splitright
-
-" Open new horizontal splits below rather than above
-set splitbelow
-
-" Requested by VimWiki
-set nocompatible
-filetype plugin on
-
-
-" All of the following are required by COC
-" TextEdit might fail if hidden is not set.
-set hidden
-
-" Some servers have issues with backup files, see #649.
-set nobackup
+set hidden " TextEdit might fail if hidden is not set.
+set nobackup " Some servers have issues with backup files, see #649.
 set nowritebackup
-
-" Give more space for displaying messages.
-set cmdheight=2
-
-" Having longer updatetime (default is 4000 ms = 4 s) leads to noticeable
-" delays and poor user experience.
+set cmdheight=2 " Give more space for displaying messages.
 set updatetime=300
-
 " Don't pass messages to |ins-completion-menu|.
 set shortmess+=c
-
 " Always show the signcolumn, otherwise it would shift the text each time
 " diagnostics appear/become resolved.
 set signcolumn=yes
-
 " Use tab for trigger completion with characters ahead and navigate.
 " NOTE: Use command ':verbose imap <tab>' to make sure tab is not mapped by
 " other plugin before putting this into your config.
@@ -332,15 +189,12 @@ inoremap <silent><expr> <TAB>
       \ <SID>check_back_space() ? "\<TAB>" :
       \ coc#refresh()
 inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
-
 function! s:check_back_space() abort
   let col = col('.') - 1
   return !col || getline('.')[col - 1]  =~# '\s'
 endfunction
-
 " Use <c-space> to trigger completion.
 inoremap <silent><expr> <c-space> coc#refresh()
-
 " Use <cr> to confirm completion, `<C-g>u` means break undo chain at current
 " position. Coc only does snippet and additional edit on confirm.
 if has('patch8.1.1068')
@@ -349,20 +203,16 @@ if has('patch8.1.1068')
 else
   imap <expr> <cr> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
 endif
-
 " Use `[g` and `]g` to navigate diagnostics
 nmap <silent> [g <Plug>(coc-diagnostic-prev)
 nmap <silent> ]g <Plug>(coc-diagnostic-next)
-
 " GoTo code navigation.
 nmap <silent> gd <Plug>(coc-definition)
 nmap <silent> gy <Plug>(coc-type-definition)
 nmap <silent> gi <Plug>(coc-implementation)
 nmap <silent> gr <Plug>(coc-references)
-
 " Use K to show documentation in preview window.
 nnoremap <silent> K :call <SID>show_documentation()<CR>
-
 function! s:show_documentation()
   if (index(['vim','help'], &filetype) >= 0)
     execute 'h '.expand('<cword>')
@@ -370,20 +220,16 @@ function! s:show_documentation()
     call CocAction('doHover')
   endif
 endfunction
-
 " Highlight the symbol and its references when holding the cursor.
 augroup CocHoldHighlight
   autocmd!
   autocmd CursorHold * silent call CocActionAsync('highlight')
 augroup end
-
 " Symbol renaming.
 nmap <leader>rn <Plug>(coc-rename)
-
 " Formatting selected code.
 xmap <leader>f  <Plug>(coc-format-selected)
 nmap <leader>f  <Plug>(coc-format-selected)
-
 augroup mygroup
   autocmd!
   " Setup formatexpr specified filetype(s).
@@ -391,44 +237,35 @@ augroup mygroup
   " Update signature help on jump placeholder.
   autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
 augroup end
-
 " Applying codeAction to the selected region.
 " Example: `<leader>aap` for current paragraph
 xmap <leader>a  <Plug>(coc-codeaction-selected)
 nmap <leader>a  <Plug>(coc-codeaction-selected)
-
 " Remap keys for applying codeAction to the current line.
 nmap <leader>ac  <Plug>(coc-codeaction)
 " Apply AutoFix to problem on the current line.
 nmap <leader>qf  <Plug>(coc-fix-current)
-
 " Introduce function text object
 " NOTE: Requires 'textDocument.documentSymbol' support from the language server.
 xmap if <Plug>(coc-funcobj-i)
 xmap af <Plug>(coc-funcobj-a)
 omap if <Plug>(coc-funcobj-i)
 omap af <Plug>(coc-funcobj-a)
-
 " Use <TAB> for selections ranges.
 " NOTE: Requires 'textDocument/selectionRange' support from the language server.
 " coc-tsserver, coc-python are the examples of servers that support it.
 nmap <silent> <TAB> <Plug>(coc-range-select)
 xmap <silent> <TAB> <Plug>(coc-range-select)
-
 " Add `:Format` command to format current buffer.
 command! -nargs=0 Format :call CocAction('format')
-
 " Add `:Fold` command to fold current buffer.
 command! -nargs=? Fold :call     CocAction('fold', <f-args>)
-
 " Add `:OR` command for organize imports of the current buffer.
 command! -nargs=0 OR   :call     CocAction('runCommand', 'editor.action.organizeImport')
-
 " Add (Neo)Vim's native statusline support.
 " NOTE: Please see `:h coc-status` for integrations with external plugins that
 " provide custom statusline: lightline.vim, vim-airline.
 set statusline^=%{coc#status()}%{get(b:,'coc_current_function','')}
-
 " Mappings using CoCList:
 " Show all diagnostics.
 nnoremap <silent> <space>a  :<C-u>CocList diagnostics<cr>
@@ -446,4 +283,54 @@ nnoremap <silent> <space>j  :<C-u>CocNext<CR>
 nnoremap <silent> <space>k  :<C-u>CocPrev<CR>
 " Resume latest coc list.
 nnoremap <silent> <space>p  :<C-u>CocListResume<CR>
+" Run Prettier
+command! -nargs=0 Prettier :CocCommand prettier.formatFile
+" }}}
+" Ctrl-P {{{
+let g:ctrlp_map = '<c-p>'
+let g:ctrlp_cmd = 'CtrlP'
+let g:ctrlp_working_path_mode = 'ra'
+let g:ctrlp_max_files = 0
+let g:ctrlp_cache_dir = $HOME . '/.cache/ctrlp'
+if executable('ag')
+  set grepprg=ag\ --nogroup\ --nocolor\ --hidden\ --ignore\ .git " Use ag over grep
+  let g:ctrlp_user_command = 'ag %s -l --hidden --ignore .git --nocolor -g ""'
+  let g:ctrlp_use_caching = 0 " ag is fast enough that CtrlP doesn't need to cache
+endif
+" }}}
+" Lightline {{{
+function! s:LightlineReload()
+  call lightline#init()
+  call lightline#colorscheme()
+  call lightline#update()
+endfunction
+" Reload lightline when re-sourcing vimrc
+augroup ReloadLightline
+  autocmd!
+  autocmd SourcePost *.vimrc call <SID>LightlineReload()
+augroup end
+" }}}
+" NerdTree {{{
+augroup NerdTreeOnQuit
+  autocmd!
+  autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
+augroup END
+map <C-n> :NERDTreeToggle<CR>
+map <leader>n :NERDTreeFind<CR>
+let NERDTreeShowHidden=1
+let NERDTreeIgnore=['\.git$', '.DS_Store']
+let NERDTreeShowLineNumbers=1
+let g:NERDTreeWinSize=50
+" }}}
+" Tmux navigator {{{
+" Prevents unzooming when accidentally navigating beyond edges
+let g:tmux_navigator_disable_when_zoomed = 1
+" }}}
+" Vimwiki {{{
+" Use markdown instead of default syntax
+let g:vimwiki_list = [{'path': '~/vimwiki/', 'syntax': 'markdown', 'ext': '.md'}]
+" Make sure vim only treats markdown files in the wiki directory as vimwiki files
+let g:vimwiki_global_ext = 0
+" }}}
+" }}}
 
