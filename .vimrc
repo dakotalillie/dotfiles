@@ -74,9 +74,23 @@ let maplocalleader = ","
 nnoremap <space> <nop>
 " Easy editing of vimrc
 nnoremap <leader>ev :tabe ~/.vimrc<cr>
-" Quickfix shortcuts
-nnoremap <leader>qo :copen<cr>
-nnoremap <leader>qq :cclose<cr>
+" Quickfix toggling
+nnoremap <leader>qt :call <SID>ToggleQuickfix()<cr>
+function! s:ToggleQuickfix()
+  for winnr in range(1, winnr('$'))
+    if getwinvar(winnr, '&syntax') ==# 'qf'
+      cclose
+      return
+    endif
+  endfor
+  copen
+endfunction
+" Automatically open quickfix after search
+augroup quickfix
+  autocmd!
+  autocmd QuickFixCmdPost [^l]* cwindow
+  autocmd QuickFixCmdPost l* lwindow
+augroup end
 " Shorcuts for tabs
 nnoremap <leader>tn :tabn<cr>
 nnoremap <leader>tp :tabp<cr>
@@ -96,21 +110,16 @@ function! s:ToggleGlobalFold()
     normal! zR
   endif
 endfunction
-" Automatically open quickfix after search
-augroup quickfix
-    autocmd!
-    autocmd QuickFixCmdPost [^l]* cwindow
-    autocmd QuickFixCmdPost l* lwindow
-augroup END
+nnoremap <leader>gg :silent grep!<space>
 " Grep operator {{{
 " g@ calls the function assigned to operatorfunc as an operator
 " <SID> allows for referencing a value that's scoped to the current script
-nnoremap <leader>g :set operatorfunc=<SID>GrepOperator<cr>g@
+nnoremap <leader>go :set operatorfunc=<SID>GrepOperator<cr>g@
 " <c-u> means 'delete from the cursor to the beginning of the line', removing the '<,'> that
 " automaticaly gets added by vim to indicate the operation should apply to the selected text.
 " visualmode() is a built-in function returning a one-character string representing the type of
 " visual mode used (characterwise, linewise, blockwise).
-vnoremap <leader>g :<c-u>call <SID>GrepOperator(visualmode())<cr>
+vnoremap <leader>go :<c-u>call <SID>GrepOperator(visualmode())<cr>
 " The s: prefix places this in the current script's namespace
 function! s:GrepOperator(type)
   let savedUnnamedRegister = @@
