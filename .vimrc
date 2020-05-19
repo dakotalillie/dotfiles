@@ -111,6 +111,11 @@ function! s:ToggleGlobalFold()
   endif
 endfunction
 nnoremap <leader>gg :silent grep!<space>
+" Merge conflict resolution
+" LO is for local
+nnoremap <leader>dl :diffg LO<cr>
+" RE is for remote
+nnoremap <leader>dr :diffg RE<cr>
 " Grep operator {{{
 " g@ calls the function assigned to operatorfunc as an operator
 " <SID> allows for referencing a value that's scoped to the current script

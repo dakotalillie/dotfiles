@@ -146,3 +146,16 @@ tic -x tmux-256color.terminfo
 In iTerm, you'll then need to go to Preferences > Profiles > Default, make sure
 that Text > Italic text allowed is checked, and set Terminal > Report Terminal
 Type to `xterm-256color-italic`
+
+You can use vim for resolving git conflicts by running
+`git config --global --edit` and adding the following:
+
+```gitconfig
+[merge]
+    tool = vimdiff
+[mergetool]
+    keepBackup = false
+    prompt = false
+[mergetool "vimdiff"]
+    cmd = nvim -d $BASE $LOCAL $REMOTE $MERGED -c '$wincmd w' -c 'wincmd J'
+```
