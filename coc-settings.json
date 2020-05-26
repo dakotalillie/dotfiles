@@ -9,5 +9,6 @@
     "markdown"
   ],
   "prettier.proseWrap": "always",
-  "javascript.suggestionActions.enabled": false
+  "javascript.suggestionActions.enabled": false,
+  "intelephense.stubs": ["wordpress"]
 }

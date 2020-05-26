@@ -197,7 +197,8 @@ let g:coc_global_extensions = [
   \ 'coc-eslint',
   \ 'coc-prettier',
   \ 'coc-json',
-  \ 'coc-python'
+  \ 'coc-python',
+  \ 'coc-phpls'
   \ ]
 set hidden " TextEdit might fail if hidden is not set.
 set nobackup " Some servers have issues with backup files, see #649.
