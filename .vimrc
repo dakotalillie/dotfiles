@@ -12,6 +12,7 @@ Plug 'airblade/vim-gitgutter' " Git gutter
 Plug 'tpope/vim-surround' " Surrounds
 Plug 'ctrlpvim/ctrlp.vim' " Fuzzy finder
 Plug 'sheerun/vim-polyglot' " Syntax highlighting
+Plug 'styled-components/vim-styled-components', { 'branch': 'main' } " CSS in JS syntax support
 Plug 'itchyny/lightline.vim' " Status line
 Plug 'tpope/vim-commentary' " Code commenting
 Plug 'tpope/vim-unimpaired' " Bracket mappings
@@ -66,6 +67,9 @@ endif
 hi DiffAdd ctermbg=235 ctermfg=108 cterm=reverse guibg=#262626 guifg=#87af87 gui=reverse
 hi DiffChange ctermbg=235 ctermfg=103 cterm=reverse guibg=#262626 guifg=#8787af gui=reverse
 hi DiffDelete ctermbg=235 ctermfg=131 cterm=reverse guibg=#262626 guifg=#af5f5f gui=reverse
+" More accurate syntax highlighting for js/ts files, at the expense of speed
+autocmd BufEnter *.{js,jsx,ts,tsx} :syntax sync fromstart
+autocmd BufLeave *.{js,jsx,ts,tsx} :syntax sync clear
 " }}}
 " Mappings {{{
 " Leader mappings
