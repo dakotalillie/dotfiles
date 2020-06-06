@@ -31,7 +31,6 @@ call plug#end()
 " }}}
 " Styles {{{
 colorscheme onedark
-let g:lightline = { 'colorscheme': 'onedark' }
 let g:onedark_terminal_italics = 1
 " Normally, vim-sleuth will infer the correct indentation. However, in cases where the desired
 " indentation cannot be inferred, vim-sleuth normally defaults to 8 spaces, which is... not great.
@@ -202,7 +201,8 @@ let g:coc_global_extensions = [
   \ 'coc-prettier',
   \ 'coc-json',
   \ 'coc-python',
-  \ 'coc-phpls'
+  \ 'coc-phpls',
+  \ 'coc-go'
   \ ]
 set hidden " TextEdit might fail if hidden is not set.
 set nobackup " Some servers have issues with backup files, see #649.
@@ -332,6 +332,18 @@ if executable('ag')
 endif
 " }}}
 " Lightline {{{
+let g:lightline = {
+  \ 'colorscheme': 'onedark',
+  \ 'active': {
+    \ 'left': [
+      \ [ 'mode', 'paste' ],
+      \ [ 'readonly', 'filename', 'modified', 'gitbranch' ]
+    \ ]
+  \ },
+  \ 'component_function': {
+    \ 'gitbranch': 'FugitiveHead'
+  \ }
+\ }
 function! s:LightlineReload()
   call lightline#init()
   call lightline#colorscheme()
