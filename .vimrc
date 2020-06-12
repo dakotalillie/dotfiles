@@ -11,12 +11,16 @@ Plug 'tpope/vim-fugitive' " Git stuff
 Plug 'airblade/vim-gitgutter' " Git gutter
 Plug 'tpope/vim-surround' " Surrounds
 Plug 'ctrlpvim/ctrlp.vim' " Fuzzy finder
+Plug 'junegunn/fzf', { 'do': { -> fzf#install() } } " Other fuzzy finder
+Plug 'junegunn/fzf.vim' " FZF bindings for vim in particular
 Plug 'sheerun/vim-polyglot' " Syntax highlighting
 Plug 'itchyny/lightline.vim' " Status line
 Plug 'tpope/vim-commentary' " Code commenting
 Plug 'tpope/vim-unimpaired' " Bracket mappings
 Plug 'christoomey/vim-tmux-navigator' " Tmux integration
 Plug 'joshdick/onedark.vim' " Theme
+Plug 'styled-components/vim-styled-components', { 'branch': 'main' } " Syntax highlighting for styled components
+Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app & yarn install' } " Preview markdown files
 Plug 'ntpeters/vim-better-whitespace' " Whitespace highlighting and removal
 Plug 'jiangmiao/auto-pairs' " Auto pairs
 Plug 'preservim/nerdtree' " Nerd tree
@@ -198,13 +202,14 @@ let g:coc_global_extensions = [
   \ 'coc-prettier',
   \ 'coc-json',
   \ 'coc-python',
-  \ 'coc-phpls'
+  \ 'coc-phpls',
+  \ 'coc-go'
   \ ]
 set hidden " TextEdit might fail if hidden is not set.
 set nobackup " Some servers have issues with backup files, see #649.
 set nowritebackup
 set cmdheight=2 " Give more space for displaying messages.
-set updatetime=300
+set updatetime=100
 " Don't pass messages to |ins-completion-menu|.
 set shortmess+=c
 " Always show the signcolumn, otherwise it would shift the text each time
@@ -326,6 +331,9 @@ if executable('ag')
   let g:ctrlp_user_command = 'ag %s -l --hidden --ignore .git --nocolor -g ""'
   let g:ctrlp_use_caching = 0 " ag is fast enough that CtrlP doesn't need to cache
 endif
+" }}}
+" FZF {{{
+let g:fzf_layout = {'up':'~90%', 'window': { 'width': 0.8, 'height': 0.8,'yoffset':0.5,'xoffset': 0.5, 'highlight': 'Todo', 'border': 'rounded' } }
 " }}}
 " Lightline {{{
 function! s:LightlineReload()

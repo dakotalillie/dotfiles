@@ -159,3 +159,9 @@ You can use vim for resolving git conflicts by running
 [mergetool "vimdiff"]
     cmd = nvim -d $BASE $LOCAL $REMOTE $MERGED -c '$wincmd w' -c 'wincmd J'
 ```
+
+The markdown-preview plugin requires `yarn`. Make sure to install it with
+
+```sh
+brew install yarn
+```
