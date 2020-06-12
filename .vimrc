@@ -14,6 +14,7 @@ Plug 'ctrlpvim/ctrlp.vim' " Fuzzy finder
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } } " Other fuzzy finder
 Plug 'junegunn/fzf.vim' " FZF bindings for vim in particular
 Plug 'sheerun/vim-polyglot' " Syntax highlighting
+Plug 'styled-components/vim-styled-components', { 'branch': 'main' } " CSS in JS syntax support
 Plug 'itchyny/lightline.vim' " Status line
 Plug 'tpope/vim-commentary' " Code commenting
 Plug 'tpope/vim-unimpaired' " Bracket mappings
@@ -34,7 +35,6 @@ call plug#end()
 " }}}
 " Styles {{{
 colorscheme onedark
-let g:lightline = { 'colorscheme': 'onedark' }
 let g:onedark_terminal_italics = 1
 " Normally, vim-sleuth will infer the correct indentation. However, in cases where the desired
 " indentation cannot be inferred, vim-sleuth normally defaults to 8 spaces, which is... not great.
@@ -70,6 +70,9 @@ endif
 hi DiffAdd ctermbg=235 ctermfg=108 cterm=reverse guibg=#262626 guifg=#87af87 gui=reverse
 hi DiffChange ctermbg=235 ctermfg=103 cterm=reverse guibg=#262626 guifg=#8787af gui=reverse
 hi DiffDelete ctermbg=235 ctermfg=131 cterm=reverse guibg=#262626 guifg=#af5f5f gui=reverse
+" More accurate syntax highlighting for js/ts files, at the expense of speed
+autocmd BufEnter *.{js,jsx,ts,tsx} :syntax sync fromstart
+autocmd BufLeave *.{js,jsx,ts,tsx} :syntax sync clear
 " }}}
 " Mappings {{{
 " Leader mappings
@@ -336,6 +339,18 @@ endif
 let g:fzf_layout = {'up':'~90%', 'window': { 'width': 0.8, 'height': 0.8,'yoffset':0.5,'xoffset': 0.5, 'highlight': 'Todo', 'border': 'rounded' } }
 " }}}
 " Lightline {{{
+let g:lightline = {
+  \ 'colorscheme': 'onedark',
+  \ 'active': {
+    \ 'left': [
+      \ [ 'mode', 'paste' ],
+      \ [ 'readonly', 'filename', 'modified', 'gitbranch' ]
+    \ ]
+  \ },
+  \ 'component_function': {
+    \ 'gitbranch': 'FugitiveHead'
+  \ }
+\ }
 function! s:LightlineReload()
   call lightline#init()
   call lightline#colorscheme()
