@@ -10,9 +10,8 @@ Plug 'tpope/vim-sensible' " Defaults
 Plug 'tpope/vim-fugitive' " Git stuff
 Plug 'airblade/vim-gitgutter' " Git gutter
 Plug 'tpope/vim-surround' " Surrounds
-Plug 'ctrlpvim/ctrlp.vim' " Fuzzy finder
-Plug 'junegunn/fzf', { 'do': { -> fzf#install() } } " Other fuzzy finder
-Plug 'junegunn/fzf.vim' " FZF bindings for vim in particular
+Plug 'junegunn/fzf', { 'do': { -> fzf#install() } } " Fuzzy finder
+Plug 'junegunn/fzf.vim' " FZF bindings for vim
 Plug 'sheerun/vim-polyglot' " Syntax highlighting
 Plug 'styled-components/vim-styled-components', { 'branch': 'main' } " CSS in JS syntax support
 Plug 'itchyny/lightline.vim' " Status line
@@ -34,8 +33,6 @@ Plug 'tpope/vim-sleuth' " Indentation
 call plug#end()
 " }}}
 " Styles {{{
-colorscheme onedark
-let g:onedark_terminal_italics = 1
 " Normally, vim-sleuth will infer the correct indentation. However, in cases where the desired
 " indentation cannot be inferred, vim-sleuth normally defaults to 8 spaces, which is... not great.
 " This changes that, so that the default is set to 2 spaces for certain filetypes, and 4 spaces for
@@ -49,23 +46,7 @@ if get(g:, '_has_set_default_indent_settings', 0) == 0
   set shiftwidth=4
   let g:_has_set_default_indent_settings = 1
 endif
-" Enable italics
-let &t_8f="\<Esc>[38;2;%lu;%lu;%lum"
-let &t_8b="\<Esc>[48;2;%lu;%lu;%lum"
-"Credit joshdick
-"Use 24-bit (true-color) mode in Vim/Neovim when outside tmux.
-"If you're using tmux version 2.2 or later, you can remove the outermost $TMUX check and use tmux's 24-bit color support
-"(see < http://sunaku.github.io/tmux-24bit-color.html#usage > for more information.)
-if (has("nvim"))
-  "For Neovim 0.1.3 and 0.1.4 < https://github.com/neovim/neovim/pull/2198 >
-  let $NVIM_TUI_ENABLE_TRUE_COLOR=1
-endif
-"For Neovim > 0.1.5 and Vim > patch 7.4.1799 < https://github.com/vim/vim/commit/61be73bb0f965a895bfb064ea3e55476ac175162 >
-"Based on Vim patch 7.4.1770 (`guicolors` option) < https://github.com/vim/vim/commit/8a633e3427b47286869aa4b96f2bfc1fe65b25cd >
-" < https://github.com/neovim/neovim/wiki/Following-HEAD#20160511 >
-if (has("termguicolors"))
-  set termguicolors
-endif
+set termguicolors
 " Diff coloring
 hi DiffAdd ctermbg=235 ctermfg=108 cterm=reverse guibg=#262626 guifg=#87af87 gui=reverse
 hi DiffChange ctermbg=235 ctermfg=103 cterm=reverse guibg=#262626 guifg=#8787af gui=reverse
@@ -73,6 +54,12 @@ hi DiffDelete ctermbg=235 ctermfg=131 cterm=reverse guibg=#262626 guifg=#af5f5f 
 " More accurate syntax highlighting for js/ts files, at the expense of speed
 autocmd BufEnter *.{js,jsx,ts,tsx} :syntax sync fromstart
 autocmd BufLeave *.{js,jsx,ts,tsx} :syntax sync clear
+" Putting this at the end so that it respects any settings set earlier
+colorscheme onedark
+let g:onedark_terminal_italics = 1
+" Enable italics
+let &t_8f="\<Esc>[38;2;%lu;%lu;%lum"
+let &t_8b="\<Esc>[48;2;%lu;%lu;%lum"
 " }}}
 " Mappings {{{
 " Leader mappings
@@ -123,6 +110,7 @@ nnoremap <leader>gg :silent grep!<space>
 nnoremap <leader>dl :diffg LO<cr>
 " RE is for remote
 nnoremap <leader>dr :diffg RE<cr>
+nnoremap <C-p> :Files<cr>
 " Grep operator {{{
 " g@ calls the function assigned to operatorfunc as an operator
 " <SID> allows for referencing a value that's scoped to the current script
@@ -172,6 +160,7 @@ set clipboard+=unnamedplus " Enable copying from vim
 set splitright " Open new vertical splits to the right instead of the left
 set splitbelow " Open new horizontal splits below rather than above
 set nocompatible " Requested by VimWiki
+set grepprg=rg\ --hidden\ -g\ '!.git'\ --no-heading\ --vimgrep " Use rg for grep
 filetype plugin on
 augroup VimFileSettings
   autocmd!
@@ -323,20 +312,24 @@ nnoremap <silent> <space>p  :<C-u>CocListResume<CR>
 " Run Prettier
 command! -nargs=0 Prettier :CocCommand prettier.formatFile
 " }}}
-" Ctrl-P {{{
-let g:ctrlp_map = '<c-p>'
-let g:ctrlp_cmd = 'CtrlP'
-let g:ctrlp_working_path_mode = 'ra'
-let g:ctrlp_max_files = 0
-let g:ctrlp_cache_dir = $HOME . '/.cache/ctrlp'
-if executable('ag')
-  set grepprg=ag\ --nogroup\ --nocolor\ --hidden\ --ignore\ .git " Use ag over grep
-  let g:ctrlp_user_command = 'ag %s -l --hidden --ignore .git --nocolor -g ""'
-  let g:ctrlp_use_caching = 0 " ag is fast enough that CtrlP doesn't need to cache
-endif
-" }}}
 " FZF {{{
-let g:fzf_layout = {'up':'~90%', 'window': { 'width': 0.8, 'height': 0.8,'yoffset':0.5,'xoffset': 0.5, 'highlight': 'Todo', 'border': 'rounded' } }
+let g:fzf_layout = {'up':'~90%', 'window': { 'width': 0.8, 'height': 0.8, 'yoffset':0.5, 'xoffset': 0.5, 'highlight': 'Statement', 'border': 'sharp' } }
+let $FZF_DEFAULT_OPTS='--layout=reverse --info=inline'
+let g:fzf_colors =
+\ { 'fg':      ['fg', 'Normal'],
+  \ 'bg':      ['bg', 'Normal'],
+  \ 'hl':      ['fg', 'Comment'],
+  \ 'fg+':     ['fg', 'CursorLine', 'CursorColumn', 'Normal'],
+  \ 'bg+':     ['bg', 'CursorLine', 'CursorColumn'],
+  \ 'hl+':     ['fg', 'Statement'],
+  \ 'info':    ['fg', 'PreProc'],
+  \ 'border':  ['fg', 'Ignore'],
+  \ 'prompt':  ['fg', 'Conditional'],
+  \ 'pointer': ['fg', 'Keyword'],
+  \ 'marker':  ['fg', 'Keyword'],
+  \ 'spinner': ['fg', 'Label'],
+  \ 'header':  ['fg', 'Comment'] }
+
 " }}}
 " Lightline {{{
 let g:lightline = {
