@@ -23,3 +23,7 @@ You can then save all the files by running:
 ```
 :cfdo update
 ```
+
+## Pane Management
+
+Use `<C-w> <C-t>` to swap the position of two panes

@@ -165,3 +165,9 @@ The markdown-preview plugin requires `yarn`. Make sure to install it with
 ```sh
 brew install yarn
 ```
+
+Previews for fzf require bat. Install with
+
+```sh
+brew install bat
+```
